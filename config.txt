@@ -1,0 +1,2 @@
+monitor.files=/path/1/file1.log|File1,/path/2/file2.log|File2,/path/3/file3.log|File3
+
