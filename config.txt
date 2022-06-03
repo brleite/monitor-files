@@ -1,2 +1,2 @@
-monitor.files=/path/1/file1.log|File1,/path/2/file2.log|File2,/path/3/file3.log|File3
+monitor.files=/DRIVE/tmp/access_test.log|HD1,/DRIVE2/tmp/access_test.log|HD2,/DRIVE3/tmp/access_test.log|HD3,/GOOGLE_DRIVE/tmp/access_test.log|GOOGLE_DRIVE (mayerle.labs)
 

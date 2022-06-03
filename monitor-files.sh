@@ -1,4 +1,4 @@
-#!/bin/sh 
+#!/bin/bash 
 
 export PYTHONPATH=/opt/python-modules/telegram-bot
 BASEDIR=$(dirname "$0")
@@ -10,6 +10,7 @@ CURRENT_FILE_PREFIX=monitor_files_current
 LAST_FILE_PREFIX=monitor_files_last
 SUCCESS_MESSAGE_SUFIX="encontrado"
 ERROR_MESSAGE_SUFIX="não encontrado"
+FLAG="SUCESSO"
 
 function getProperty {
   PROP_KEY=$1
@@ -23,7 +24,6 @@ MONITOR_FILES=$(getProperty "monitor.files")
 echo $MONITOR_FILES
 
 IFS=','
-#for file_message in ${MONITOR_FILES//,/ } ; do 
 for file_message in $MONITOR_FILES ; do 
   echo "Verificando arquivo \"$file_message\""
 
@@ -41,10 +41,15 @@ for file_message in $MONITOR_FILES ; do
   # echo $last_log_file
 
   ls $file
+  retVal1=$?
+
+  current_flag=`cat $file`
+  retVal2=$?
   
-  retVal=$?
-  if [ $retVal -ne 0 ]; then
+
+  if [ $retVal1 -ne 0 ] || [ $retVal2 -ne 0 ] || [ "$current_flag" != "$FLAG" ]; then
     echo "Arquivo inexistente"
+    flag_controle=1
     
     if [ -f "$current_log_file" ]; then
       current_value=`cat $current_log_file`
@@ -54,21 +59,22 @@ for file_message in $MONITOR_FILES ; do
         python3 $PYTHON_NOTIFY "$message $ERROR_MESSAGE_SUFIX"
         
         echo $current_value > $last_log_file
-	echo $retVal > $current_log_file
+        echo $flag_controle > $current_log_file
       else
         echo "Não é preciso enviar notificação"
         echo $current_value > $last_log_file
-        echo $retVal > $current_log_file
+        echo $flag_controle > $current_log_file
       fi
     else
       echo "Enviando notificacao"
       python3 $PYTHON_NOTIFY "$message $ERROR_MESSAGE_SUFIX"
 
       echo "0" > $last_log_file
-      echo $retVal > $current_log_file 
+      echo $flag_controle > $current_log_file 
     fi
   else
     echo "Arquivo existente"
+    flag_controle=0
 
     if [ -f "$current_log_file" ]; then
       current_value=`cat $current_log_file`
@@ -77,20 +83,20 @@ for file_message in $MONITOR_FILES ; do
         echo "Não precisa de notificacao"
 
         echo $current_value > $last_log_file
-        echo $retVal > $current_log_file
+        echo $flag_controle > $current_log_file
       else
         echo "Enviando notificação"
         python3 $PYTHON_NOTIFY "$message $SUCCESS_MESSAGE_SUFIX"
 
         echo $current_value > $last_log_file
-        echo $retVal > $current_log_file
+        echo $flag_controle > $current_log_file
       fi
     else
       echo "Enviando notificacao"
         python3 $PYTHON_NOTIFY "$message $SUCCESS_MESSAGE_SUFIX"
 
       echo "0" > $last_log_file
-      echo $retVal > $current_log_file
+      echo $flag_controle > $current_log_file
     fi
   fi
 done
