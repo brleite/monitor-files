@@ -42,12 +42,29 @@ for file_message in $MONITOR_FILES ; do
 
   ls $file
   retVal1=$?
+  
+  if [ $retVal1 -ne 0 ]; then
+    echo "Erro ao listar arquivo $file"
+  fi
 
   current_flag=`cat $file`
   retVal2=$?
-  
 
-  if [ $retVal1 -ne 0 ] || [ $retVal2 -ne 0 ] || [ "$current_flag" != "$FLAG" ]; then
+  if [ $retVal2 -ne 0 ]; then
+    echo "Erro ao exibir conteúdo do arquivo $file"
+  fi
+  
+  drive=`echo $file | cut -d '/' -f 2`
+  drive="/$drive"
+
+  ls $drive
+  retVal3=$?
+
+  if [ $retVal3 -ne 0 ]; then
+    echo "Erro ao listar drive $drive"
+  fi
+
+  if [ $retVal1 -ne 0 ] || [ $retVal2 -ne 0 ] || [ $retVal3 -ne 0 ] || [ "$current_flag" != "$FLAG" ]; then
     echo "Arquivo inexistente"
     flag_controle=1
     
